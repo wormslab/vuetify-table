@@ -12,9 +12,6 @@ module.exports = {
     output: {
       libraryExport: 'default'
     },
-    externals: {
-      moment: 'moment',
-      underscore: 'underscore'
-    }
+    externals: NODE_ENV === 'development' ? {} : externals
   }
 }

@@ -102,13 +102,6 @@
       textName (column) {
         return column.key && column.text ? column.text : column
       },
-      typeName (column) {
-        return column.key && column.text && column.type ? column.type : column
-      },
-      isCheckboxType (column) {
-        const typeName = this.typeName(column)
-        return typeName === 'checkbox'
-      },
       numberWithCommas (x) {
         if (!x) {
           return x
@@ -132,22 +125,23 @@
          */
         if (column['type'] && column['type'] === 'date') {
           const format = 'YYYY-MM-DD'
-          const v = data[keyName]
+          const v = dot.pick(keyName, data)
           if (!v) {
             return v
           }
           return moment(new Date(v)).format(format)
         } else if (column['type'] && column['type'] === 'datetime') {
           const format = 'YYYY-MM-DD HH:mm:ss'
-          const v = data[keyName]
+          const v = dot.pick(keyName, data)
           if (!v) {
             return v
           }
           return moment(new Date(v)).format(format)
         } else if (column['type'] && column['type'] === 'currency') {
-          return `${this.numberWithCommas(Math.floor(data[keyName]))} 원`
+          const v = dot.pick(keyName, data)
+          return `${this.numberWithCommas(Math.floor(v))} 원`
         } else if (column['type'] && column['type'] === 'phone') {
-          const v = data[keyName]
+          const v = dot.pick(keyName, data)
           if (!v) {
             return v
           }
@@ -159,8 +153,7 @@
             return v
           }
         }
-
-        return data[keyName]
+        return dot.pick(keyName, data)
       },
       sortBy: function (key) {
         this.sortKey = key
@@ -171,31 +164,9 @@
       },
       _handleClickNext (event) {
         return this.$emit('next', event)
-      },
-      _handleChangeCheckboxHeader (value, column, index) {
-        const columnName = this.keyName(column)
-        this.$emit(`click-header-${columnName}`, value, column, index)
-      },
-      _handleChangeCheckbox (value, column, data, index) {
-        const columnName = this.keyName(column)
-        this.$emit(`click-column-${columnName}`, value, column, data, index)
       }
     },
     computed: {
-      filteredData () {
-        const sortKey = this.sortKey
-        // const filterKey = this.filterKey && this.filterKey.toLowerCase()
-        const order = this.sortOrders[sortKey] || 1
-
-        if (sortKey) {
-          return this.data.slice().sort(function (a, b) {
-            a = a[sortKey]
-            b = b[sortKey]
-            return (a === b ? 0 : a > b ? 1 : -1) * order
-          })
-        }
-        return this.data
-      },
       startIndex () {
         return (this.rowsPerPage * (this.page - 1)) + 1
       },
