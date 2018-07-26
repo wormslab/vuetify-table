@@ -1,10 +1,10 @@
 {
   "name": "@wormslab/vuetify-table",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name vuetify-table src/App.vue",
+    "build": "vue-cli-service build --target lib --name vuetify-table src/VuetifyTable.vue",
     "lint": "vue-cli-service lint"
   },
   "main": "./dist/vuetify-table.common.js",

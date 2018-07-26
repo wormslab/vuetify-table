@@ -186,6 +186,7 @@
 <style scoped>
   .admin-custom-table-container {
     width: 100%;
+    height: 100%;
     position: relative;
     overflow: auto;
   }
