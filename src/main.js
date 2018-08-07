@@ -30,9 +30,16 @@ const attrs = {
 const clazz = [ 'elevation-1' ]
 
 new Vue({
-  render: h => h('v-app', [
-    h('div', { class: 'elevation-1', style: 'width: 800px' }, [
-      h('vuetify-table', { class: clazz, attrs })
+  render (h) {
+    return h('v-app', [
+      h('div', {class: 'elevation-1', style: 'width: 800px'}, [
+        h('span', {class: ['body-1', 'font-weight-bold']}, ['커스텀 캡션']),
+        h('vuetify-table', {class: clazz, attrs}, [
+          h('div', { attrs: { slot: 'custom-caption' } }, [
+            h('span', {class: ['body-1', 'font-weight-bold']}, ['커스텀 캡션'])
+          ])
+        ])
+      ])
     ])
-  ])
+  }
 }).$mount('#app')

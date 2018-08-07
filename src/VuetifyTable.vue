@@ -2,8 +2,8 @@
   <section class="admin-custom-table-container">
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
-      <section class="custom-table-pagination">
-        <div v-if="totalElements != 0" class="mr-3"><span>{{startIndex}} - {{endIndex}} of {{totalElements}}</span></div>
+      <section class="custom-table-pagination" v-if="totalElements != 0" >
+        <div class="mr-3"><span>{{startIndex}} - {{endIndex}} of {{totalElements}}</span></div>
         <v-btn icon small :class="{ 'mr-3': true, 'display-arrow': totalElements <= 0 }" :disabled="totalElements === 0 || page === 1" @click="_handleClickPrev">
           <v-icon>chevron_left</v-icon>
         </v-btn>
@@ -27,10 +27,12 @@
         </thead>
         <tbody>
         <tr v-if="!data || data.length <= 0">
-          <td :colspan="columns.length" class="text-xs-center pa-2">No data available</td>
+          <td :colspan="columns.length" class="text-xs-center pa-2">
+            <slot name="no-data">No data available</slot>
+          </td>
         </tr>
         <tr v-for="(entry, entryIndex) in data" :key="`entry-${entryIndex}`">
-          <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`">
+          <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
             <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry }">
               <span>{{columnData(entry, key)}}</span>
             </slot>
@@ -82,6 +84,10 @@
       textModule: {
         type: Object,
         default () { return {} }
+      },
+      activeIndex: {
+        type: Number,
+        default: 1
       }
     },
     data: function () {
@@ -96,6 +102,12 @@
       }
     },
     methods: {
+      activeClass (entryIndex) {
+        const isActive = this.activeIndex === entryIndex
+        return {
+          active: isActive
+        }
+      },
       keyName (column) {
         return column.key && column.text ? column.key : column
       },
@@ -236,6 +248,10 @@
 
   td {
     background-color: #f9f9f9;
+  }
+
+  td.active {
+    background-color: #D6D9DD;
   }
 
   th, td {
