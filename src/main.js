@@ -1,45 +1,21 @@
+/* eslint-disable */
+
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VuetifyTable from './VuetifyTable.vue'
+import TransitionOnEvent from './TransitionOnEvent'
 Vue.config.productionTip = false
 
 Vue.use(Vuetify);
 Vue.component('vuetify-table', VuetifyTable);
-
-const columns = [
-  { key: 'id', text: '아이디' },
-  { key: 'name', text: '이름' },
-  { key: 'servicePeriod.startAt', text: '시작일' },
-  { key: 'servicePeriod.endAt', text: '종료일' },
-]
-
-const data = [
-  { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-  { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-]
-
-const attrs = {
-  columns,
-  data,
-  page: 1,
-  rowsPerPage: 10,
-  totalElements: 253
-}
-
-const clazz = [ 'elevation-1' ]
+Vue.component('transition-on-event', TransitionOnEvent);
 
 new Vue({
   render (h) {
     return h('v-app', [
-      h('div', {class: 'elevation-1', style: 'width: 800px'}, [
-        h('span', {class: ['body-1', 'font-weight-bold']}, ['커스텀 캡션']),
-        h('vuetify-table', {class: clazz, attrs}, [
-          h('div', { attrs: { slot: 'custom-caption' } }, [
-            h('span', {class: ['body-1', 'font-weight-bold']}, ['커스텀 캡션'])
-          ])
-        ])
-      ])
+      h('div', { class: 'elevation-1 ma-3' }, [ h('transition-on-event') ])
+
     ])
   }
 }).$mount('#app')

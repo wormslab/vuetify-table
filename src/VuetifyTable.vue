@@ -1,5 +1,5 @@
 <template>
-  <section class="admin-custom-table-container">
+  <section class="vuetify-table-container" ref="container" :style="{ height: height ? `${height}px` : null}">
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
       <section class="custom-table-pagination" v-if="totalElements != 0" >
@@ -13,7 +13,8 @@
       </section>
     </section>
     <section>
-      <table>
+      <v-slide-x-transition>
+      <table v-show="show">
         <caption>{{caption}}</caption>
         <thead>
         <tr>
@@ -32,14 +33,15 @@
           </td>
         </tr>
         <tr v-for="(entry, entryIndex) in data" :key="`entry-${entryIndex}`">
-          <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
-            <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry }">
-              <span>{{columnData(entry, key)}}</span>
-            </slot>
-          </td>
+            <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
+              <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry, index: entryIndex }">
+                <span>{{columnData(entry, key)}}</span>
+              </slot>
+            </td>
         </tr>
         </tbody>
       </table>
+        </v-slide-x-transition>
     </section>
   </section>
 </template>
@@ -87,10 +89,10 @@
       },
       activeIndex: {
         type: Number,
-        default: 1
+        default: -1
       }
     },
-    data: function () {
+    data () {
       const sortOrders = {}
       this.columns.forEach(function (column) {
         const key = (column.key && column.text) ? column.key : column
@@ -98,7 +100,9 @@
       })
       return {
         sortKey: '',
-        sortOrders: sortOrders
+        sortOrders: sortOrders,
+        show: true,
+        height: null
       }
     },
     methods: {
@@ -175,7 +179,14 @@
         return this.$emit('prev', event)
       },
       _handleClickNext (event) {
-        return this.$emit('next', event)
+        const rect = this.$refs.container.getBoundingClientRect()
+        this.show = false
+        this.height = rect.height
+        setTimeout(() => {
+          this.show = true
+          this.height = null
+          return this.$emit('next', event)
+        }, 500)
       }
     },
     computed: {
@@ -196,7 +207,7 @@
 </script>
 
 <style scoped>
-  .admin-custom-table-container {
+  .vuetify-table-container {
     width: 100%;
     height: 100%;
     position: relative;
@@ -257,6 +268,7 @@
   th, td {
     white-space: nowrap;
     padding: 7px 21px;
+    height: 35px;
   }
 
   th.active {
