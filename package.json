@@ -1,6 +1,6 @@
 {
   "name": "@wormslab/vuetify-table",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",

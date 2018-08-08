@@ -5,6 +5,7 @@
                    :page="page"
                    :rows-per-page="rowsPerPage"
                    :total-elements="totalElements"
+                   key-field="id"
                    @next="_handleClickNext"
                    @prev="_handleClickPrev"
     />
@@ -22,25 +23,46 @@
         { key: 'servicePeriod.endAt', text: '종료일' },
       ]
 
-      const data = [
-        { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-        { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-        { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-        { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
-        { id: 1000, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+      const data1 = [
+        { id: 1001, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 1002, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 1003, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 1004, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 1005, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+      ]
+      const data2 = [
+        { id: 2001, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 2002, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 2003, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 2004, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 2005, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+      ]
+      const data3 = [
+        { id: 3001, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 3002, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 3003, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 3004, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
+        { id: 3005, name: 'foo', servicePeriod: { startAt: '2018-07-01', endAt: '2018-07-31' } },
       ]
       return {
         columns,
-        data,
+        datum: [ data1, data2, data3 ],
         page: 1,
-        totalElements: 10,
+        totalElements: 15,
         rowsPerPage: 5
       }
     },
     methods: {
       _handleClickNext () {
+        this.page = this.page + 1
       },
       _handleClickPrev () {
+        this.page = this.page - 1
+      }
+    },
+    computed: {
+      data () {
+        return this.datum[this.page - 1]
       }
     },
     components: {

@@ -1,5 +1,5 @@
 <template>
-  <section class="vuetify-table-container" ref="container" :style="{ height: height ? `${height}px` : null}">
+  <section class="vuetify-table-container" ref="container">
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
       <section class="custom-table-pagination" v-if="totalElements != 0" >
@@ -13,11 +13,10 @@
       </section>
     </section>
     <section>
-      <v-slide-x-transition>
-      <table v-show="show">
+      <table>
         <caption>{{caption}}</caption>
         <thead>
-        <tr>
+        <tr key="head-tr">
           <th v-for="(key, index) in columns" @click="sortBy(key)" :class="{ active: sortKey == key }" :key="`th-${index}`" >
             <slot :name="`${keyName(key)}-header`" :row="{ column: key, index }">
               <span>{{textName(key)}}</span>
@@ -32,16 +31,17 @@
             <slot name="no-data">No data available</slot>
           </td>
         </tr>
-        <tr v-for="(entry, entryIndex) in data" :key="`entry-${entryIndex}`">
-            <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
+        <tr v-for="(entry, entryIndex) in data" :key="`entry-${_keyField(entry, entryIndex)}`">
+          <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
+            <v-slide-x-transition>
               <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry, index: entryIndex }">
-                <span>{{columnData(entry, key)}}</span>
+                <div v-if="show">{{`entry-${_keyField(entry, entryIndex)}`}} / {{columnData(entry, key)}}</div>
               </slot>
-            </td>
+            </v-slide-x-transition>
+          </td>
         </tr>
         </tbody>
       </table>
-        </v-slide-x-transition>
     </section>
   </section>
 </template>
@@ -51,6 +51,18 @@
   import dot from 'dot-object'
   import moment from 'moment'
   export default {
+    data () {
+      const sortOrders = {}
+      this.columns.forEach(function (column) {
+        const key = (column.key && column.text) ? column.key : column
+        sortOrders[key] = 1
+      })
+      return {
+        sortKey: '',
+        sortOrders: sortOrders,
+        show: true
+      }
+    },
     props: {
       data: {
         type: Array,
@@ -90,19 +102,16 @@
       activeIndex: {
         type: Number,
         default: -1
-      }
-    },
-    data () {
-      const sortOrders = {}
-      this.columns.forEach(function (column) {
-        const key = (column.key && column.text) ? column.key : column
-        sortOrders[key] = 1
-      })
-      return {
-        sortKey: '',
-        sortOrders: sortOrders,
-        show: true,
-        height: null
+      },
+      keyField: {
+        type: String,
+        default () {
+          return null
+        }
+      },
+      transitionGap: {
+        type: Number,
+        default: 300,
       }
     },
     methods: {
@@ -111,6 +120,9 @@
         return {
           active: isActive
         }
+      },
+      _keyField (data, alter) {
+        return this.keyField ? data[this.keyField] : alter
       },
       keyName (column) {
         return column.key && column.text ? column.key : column
@@ -176,17 +188,18 @@
         this.sortOrders[key] = this.sortOrders[key] * -1
       },
       _handleClickPrev (event) {
-        return this.$emit('prev', event)
-      },
-      _handleClickNext (event) {
-        const rect = this.$refs.container.getBoundingClientRect()
         this.show = false
-        this.height = rect.height
         setTimeout(() => {
           this.show = true
-          this.height = null
+          return this.$emit('prev', event)
+        }, this.transitionGap)
+      },
+      _handleClickNext (event) {
+        this.show = false
+        setTimeout(() => {
+          this.show = true
           return this.$emit('next', event)
-        }, 500)
+        }, this.transitionGap)
       }
     },
     computed: {
@@ -259,6 +272,7 @@
 
   td {
     background-color: #f9f9f9;
+    position: relative;
   }
 
   td.active {
@@ -309,4 +323,5 @@
     border-right: 4px solid transparent;
     border-top: 4px solid #fff;
   }
+
 </style>
