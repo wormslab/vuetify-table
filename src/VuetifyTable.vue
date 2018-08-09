@@ -253,7 +253,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: scroll;
+    overflow-x: scroll;
   }
   .table-custom-header {
     display: flex;
