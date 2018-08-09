@@ -1,5 +1,5 @@
 <template>
-  <section class="vuetify-table-container" ref="container">
+  <section class="vuetify-table-container">
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
       <section class="custom-table-pagination" v-if="totalElements != 0" >
@@ -17,7 +17,7 @@
         <caption>{{caption}}</caption>
         <thead>
         <tr key="head-tr">
-          <th v-for="(key, index) in columns" @click="sortBy(key)" :class="{ active: sortKey == key }" :key="`th-${index}`" >
+          <th v-for="(key, index) in columns" @click="sortBy(key)" :class="{ active: sortKey == key }" :key="`th-${index}`" :width="colWidth(key)">
             <slot :name="`${keyName(key)}-header`" :row="{ column: key, index }">
               <span>{{textName(key)}}</span>
             </slot>
@@ -33,11 +33,13 @@
         </tr>
         <tr v-for="(entry, entryIndex) in data" :key="`entry-${_keyField(entry, entryIndex)}`">
           <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
-            <v-slide-x-transition>
-              <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry, index: entryIndex }">
-                <div v-if="show">{{`entry-${_keyField(entry, entryIndex)}`}} / {{columnData(entry, key)}}</div>
-              </slot>
-            </v-slide-x-transition>
+            <transition :name="transition">
+              <div v-if="show" :style="contentStyle(entry, key, entryIndex, keyIndex)">
+                <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry, index: entryIndex }">
+                  <div class="data-cell">{{columnData(entry, key)}}</div>
+                </slot>
+              </div>
+            </transition>
           </td>
         </tr>
         </tbody>
@@ -58,6 +60,7 @@
         sortOrders[key] = 1
       })
       return {
+        transition: 'table-slide-x-transition',
         sortKey: '',
         sortOrders: sortOrders,
         show: true
@@ -121,6 +124,13 @@
           active: isActive
         }
       },
+      contentStyle (entry, key) {
+        const ret = {}
+        if (key.align) {
+          ret.textAlign = key.align
+        }
+        return ret
+      },
       _keyField (data, alter) {
         return this.keyField ? data[this.keyField] : alter
       },
@@ -135,6 +145,9 @@
           return x
         }
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      },
+      colWidth (key) {
+        return key.width ? key.width : null
       },
       columnData (data, column) {
         const keyName = this.keyName(column)
@@ -188,18 +201,34 @@
         this.sortOrders[key] = this.sortOrders[key] * -1
       },
       _handleClickPrev (event) {
-        this.show = false
+        this.transition = 'table-slide-x-reverse-transition'
         setTimeout(() => {
-          this.show = true
-          return this.$emit('prev', event)
-        }, this.transitionGap)
+
+          this.show = false
+          setTimeout(() => {
+            this.$emit('prev', event)
+
+            setTimeout(() => {
+              this.show = true
+            })
+
+          }, this.transitionGap)
+        })
       },
       _handleClickNext (event) {
-        this.show = false
+        this.transition = 'table-slide-x-transition'
+
         setTimeout(() => {
-          this.show = true
-          return this.$emit('next', event)
-        }, this.transitionGap)
+
+          this.show = false
+          setTimeout(() => {
+            this.$emit('next', event)
+
+            setTimeout(() => {
+              this.show = true
+            })
+          }, this.transitionGap)
+        })
       }
     },
     computed: {
@@ -224,7 +253,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: auto;
+    overflow: scroll;
   }
   .table-custom-header {
     display: flex;
@@ -250,6 +279,7 @@
   }
 
   table {
+    table-layout: fixed;
     /*border: 2px solid #176BCC;*/
     border-radius: 3px;
     background-color: #fff;
@@ -299,6 +329,12 @@
     opacity: 1;
   }
 
+  td .data-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .display-arrow {
     visibility: hidden;
   }
@@ -322,6 +358,34 @@
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     border-top: 4px solid #fff;
+  }
+  .table-slide-x-transition-enter-active,
+  .table-slide-x-transition-leave-active {
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  }
+  .table-slide-x-transition-enter {
+    opacity: 0;
+    -webkit-transform: translateX(100px);
+    transform: translateX(100px);
+  }
+  .table-slide-x-transition-leave-to {
+    opacity: 0;
+    -webkit-transform: translateX(-100px);
+    transform: translateX(-100px);
+  }
+  .table-slide-x-reverse-transition-enter-active,
+  .table-slide-x-reverse-transition-leave-active {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  }
+  .table-slide-x-reverse-transition-enter {
+    opacity: 0;
+    -webkit-transform: translateX(-100px);
+    transform: translateX(-100px);
+  }
+  .table-slide-x-reverse-transition-leave-to {
+    opacity: 0;
+    -webkit-transform: translateX(100px);
+    transform: translateX(100px);
   }
 
 </style>
