@@ -171,6 +171,13 @@
             return v
           }
           return moment(new Date(v)).format(format)
+        } else if (column['type'] && column['type'] === 'month') {
+          const format = 'YYYY-MM'
+          const v = dot.pick(keyName, data)
+          if (!v) {
+            return v
+          }
+          return moment(new Date(v)).format(format)
         } else if (column['type'] && column['type'] === 'datetime') {
           const format = 'YYYY-MM-DD HH:mm:ss'
           const v = dot.pick(keyName, data)
