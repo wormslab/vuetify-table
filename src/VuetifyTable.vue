@@ -2,14 +2,13 @@
   <section class="vuetify-table-container">
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
-      <section class="custom-table-pagination" v-if="totalElements != 0" >
-        <div class="mr-3"><span>{{startIndex}} - {{endIndex}} of {{totalElements}}</span></div>
-        <v-btn icon small :class="{ 'mr-3': true, 'display-arrow': totalElements <= 0 }" :disabled="totalElements === 0 || page === 1" @click="_handleClickPrev">
-          <v-icon>chevron_left</v-icon>
-        </v-btn>
-        <v-btn icon small :class="{ 'mr-3': true, 'display-arrow': totalElements <= 0 }" :disabled="totalElements === 0 || (rowsPerPage * page) >= totalElements" @click="_handleClickNext">
-          <v-icon>chevron_right</v-icon>
-        </v-btn>
+      <section class="custom-table-pagination" >
+        <vuetify-table-column-menu class="mr-2" :columns="columns" />
+        <v-pagination :value="page"
+                      :length="pages"
+                      :total-visible="4"
+                      @input="_handleChangeInput"
+        />
       </section>
     </section>
     <section>
@@ -17,9 +16,15 @@
         <caption>{{caption}}</caption>
         <thead>
         <tr key="head-tr">
-          <th v-for="(key, index) in columns" @click="_handleClickHeader(key)" :class="{ fold: key.fold }" :key="`th-${index}`" :width="colWidth(key)">
+          <th v-if="key.display !== false" v-for="(key, index) in columns" @click="_handleClickHeader(key)" :class="{ fold: key.fold }" :key="`th-${index}`" :width="colWidth(key)">
             <slot :name="`${keyName(key)}-header`" :row="{ column: key, index }">
-              <span>{{textName(key)}}</span>
+              <div class="header-cell" v-if="!key.fold">{{textName(key)}}</div>
+              <div class="header-cell" v-else>
+                <v-tooltip top>
+                  <v-icon small dark slot="activator">keyboard_arrow_right</v-icon>
+                  {{textName(key)}}
+                </v-tooltip>
+              </div>
             </slot>
             <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'" v-if="sortKey && sortKey.length > 0"></span>
           </th>
@@ -32,7 +37,7 @@
           </td>
         </tr>
         <tr v-for="(entry, entryIndex) in data" :key="`entry-${_keyField(entry, entryIndex)}`">
-          <td v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
+          <td v-if="columns[keyIndex].display !== false" v-for="(key, keyIndex) in columns" :key="`td-${keyIndex}`" :class="activeClass(entryIndex)">
             <transition :name="transition">
               <div v-if="show" :style="contentStyle(entry, key, entryIndex, keyIndex)">
                 <slot :name="`${keyName(key)}-column`" :row="{ column: key, data: entry, index: entryIndex }">
@@ -52,6 +57,7 @@
   import _ from 'underscore'
   import dot from 'dot-object'
   import moment from 'moment'
+  import VuetifyTableColumnMenu from './VuetifyTableColumnMenu'
   export default {
     data () {
       const sortOrders = {}
@@ -67,6 +73,10 @@
       }
     },
     props: {
+      name: {
+        type: String,
+        default: null
+      },
       data: {
         type: Array,
         default () {
@@ -232,10 +242,25 @@
         this.transition = 'table-slide-x-transition'
 
         setTimeout(() => {
-
           this.show = false
           setTimeout(() => {
             this.$emit('next', event)
+
+            setTimeout(() => {
+              this.show = true
+            })
+          }, this.transitionGap)
+        })
+      },
+      _handleChangeInput (page) {
+        if (this.page === page) {
+          return
+        }
+        this.transition = this.page < page ? 'table-slide-x-transition' : 'table-slide-x-reverse-transition'
+        setTimeout(() => {
+          this.show = false
+          setTimeout(() => {
+            this.$emit('page', page)
 
             setTimeout(() => {
               this.show = true
@@ -250,6 +275,9 @@
       },
       endIndex () {
         return Math.min(this.startIndex + this.rowsPerPage - 1, this.totalElements)
+      },
+      pages () {
+        return Math.ceil(this.totalElements / this.rowsPerPage)
       }
     },
     filters: {
@@ -257,6 +285,9 @@
         const str = (column.key && column.text) ? column.key : column
         return str.charAt(0).toUpperCase() + str.slice(1)
       }
+    },
+    components: {
+      VuetifyTableColumnMenu
     }
   }
 </script>
@@ -280,7 +311,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 5px;
   }
   table {
     width: 100%;
@@ -325,8 +355,11 @@
 
   th, td {
     white-space: nowrap;
-    padding: 7px 21px;
     height: 35px;
+  }
+
+  td {
+    padding: 7px 21px;
   }
 
   th.active {
@@ -339,8 +372,10 @@
     margin-top: -8px
   }
 
-  th.active .arrow {
-    opacity: 1;
+  th .header-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   td .data-cell {
@@ -353,26 +388,6 @@
     visibility: hidden;
   }
 
-  .arrow {
-    display: inline-block;
-    vertical-align: middle;
-    width: 0;
-    height: 0;
-    margin-left: 5px;
-    opacity: 0.66;
-  }
-
-  .arrow.asc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid #fff;
-  }
-
-  .arrow.dsc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid #fff;
-  }
   .table-slide-x-transition-enter-active,
   .table-slide-x-transition-leave-active {
     transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);

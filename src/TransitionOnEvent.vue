@@ -9,6 +9,7 @@
                    @next="_handleClickNext"
                    @prev="_handleClickPrev"
                    @click-header="_handleClickHeader"
+                   @page="_handleChangePage"
     />
   </section>
 </template>
@@ -22,6 +23,14 @@
         { key: 'id', text: '아이디', width: 200, align: 'center' },
         { key: 'name', text: '이름', width: 100 },
         { key: 'servicePeriod.startAt', text: '시작일', width: 250 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
+        { key: 'name', text: '이름', width: 100 },
         { key: 'servicePeriod.endAt', text: '종료일', width: 250 },
       ]
 
@@ -64,6 +73,9 @@
       },
       _handleClickHeader (header) {
         Vue.set(header, 'fold', header.fold === true ? false : true)
+      },
+      _handleChangePage (page) {
+        this.page = page
       }
     },
     computed: {
