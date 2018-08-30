@@ -3,7 +3,7 @@
     <section class="table-custom-header">
       <slot class="table-custom-caption" name="custom-caption" />
       <section class="custom-table-pagination" >
-        <vuetify-table-column-menu class="mr-2" :columns="columns" />
+        <vuetify-table-column-menu class="mr-2" :name="name" :columns="columns" />
         <v-pagination :value="page"
                       :length="pages"
                       :total-visible="4"
@@ -58,6 +58,7 @@
   import dot from 'dot-object'
   import moment from 'moment'
   import VuetifyTableColumnMenu from './VuetifyTableColumnMenu'
+  import transformByType from './transform-by-type'
   export default {
     data () {
       const sortOrders = {}
@@ -179,84 +180,20 @@
 
         /**
          * column 정보에서 type 이 추가적으로 제공되었을 경우 타입에 맞게 값을 변경한다
-         * Date: 가자고 주문관련 시간정보는 TIMESTAMP 로 되어있으므로 UTC 를 사용한다. 사용자가 읽기 어렵기 때문에 날짜까지만 기본적으로 표기하도록 한다
          */
-        if (column['type'] && column['type'] === 'date') {
-          const format = 'YYYY-MM-DD'
-          const v = dot.pick(keyName, data)
-          if (!v) {
-            return v
-          }
-          return moment(new Date(v)).format(format)
-        } else if (column['type'] && column['type'] === 'month') {
-          const format = 'YYYY-MM'
-          const v = dot.pick(keyName, data)
-          if (!v) {
-            return v
-          }
-          return moment(new Date(v)).format(format)
-        } else if (column['type'] && column['type'] === 'datetime') {
-          const format = 'YYYY-MM-DD HH:mm:ss'
-          const v = dot.pick(keyName, data)
-          if (!v) {
-            return v
-          }
-          return moment(new Date(v)).format(format)
-        } else if (column['type'] && column['type'] === 'currency') {
-          const v = dot.pick(keyName, data)
-          return `${this.numberWithCommas(Math.floor(v))} 원`
-        } else if (column['type'] && column['type'] === 'phone') {
-          const v = dot.pick(keyName, data)
-          if (!v) {
-            return v
-          }
-          if (v.length === 11) {
-            return `${v.substring(0,3)}-${v.substring(3, 7)}-${v.substring(7, 11)}`
-          } else if (v.length === 10) {
-            return `${v.substring(0,3)}-${v.substring(3, 6)}-${v.substring(6, 10)}`
-          } else {
-            return v
-          }
-        }
-        return dot.pick(keyName, data)
+        return transformByType(column, keyName, data)
       },
       _handleClickHeader: function (header) {
         this.$emit('click-header', header)
-      },
-      _handleClickPrev (event) {
-        this.transition = 'table-slide-x-reverse-transition'
-        setTimeout(() => {
-
-          this.show = false
-          setTimeout(() => {
-            this.$emit('prev', event)
-
-            setTimeout(() => {
-              this.show = true
-            })
-
-          }, this.transitionGap)
-        })
-      },
-      _handleClickNext (event) {
-        this.transition = 'table-slide-x-transition'
-
-        setTimeout(() => {
-          this.show = false
-          setTimeout(() => {
-            this.$emit('next', event)
-
-            setTimeout(() => {
-              this.show = true
-            })
-          }, this.transitionGap)
-        })
       },
       _handleChangeInput (page) {
         if (this.page === page) {
           return
         }
         this.transition = this.page < page ? 'table-slide-x-transition' : 'table-slide-x-reverse-transition'
+        /**
+         * TODO: 페이지 변경이 일어날 때 event 전달 후 테이블이 바뀌는 경우를 캐치할 수 없기 때문에 코드를 변경해야 할 필요가 있다
+         */
         setTimeout(() => {
           this.show = false
           setTimeout(() => {

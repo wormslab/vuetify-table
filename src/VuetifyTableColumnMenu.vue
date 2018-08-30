@@ -39,6 +39,10 @@
         default () {
           return []
         }
+      },
+      name: {
+        type: String,
+        default: null
       }
     },
     methods: {
