@@ -8,11 +8,13 @@
                    key-field="id"
                    @next="_handleClickNext"
                    @prev="_handleClickPrev"
+                   @click-header="_handleClickHeader"
     />
   </section>
 </template>
 
 <script>
+  import Vue from 'vue'
   import VuetifyTable from './VuetifyTable'
   export default {
     data () {
@@ -49,7 +51,8 @@
         datum: [ data1, data2, data3 ],
         page: 1,
         totalElements: 15,
-        rowsPerPage: 5
+        rowsPerPage: 5,
+        foldColumns: []
       }
     },
     methods: {
@@ -58,6 +61,9 @@
       },
       _handleClickPrev () {
         this.page = this.page - 1
+      },
+      _handleClickHeader (header) {
+        Vue.set(header, 'fold', header.fold === true ? false : true)
       }
     },
     computed: {

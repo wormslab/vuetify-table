@@ -17,7 +17,7 @@
         <caption>{{caption}}</caption>
         <thead>
         <tr key="head-tr">
-          <th v-for="(key, index) in columns" @click="sortBy(key)" :class="{ active: sortKey == key }" :key="`th-${index}`" :width="colWidth(key)">
+          <th v-for="(key, index) in columns" @click="_handleClickHeader(key)" :class="{ fold: key.fold }" :key="`th-${index}`" :width="colWidth(key)">
             <slot :name="`${keyName(key)}-header`" :row="{ column: key, index }">
               <span>{{textName(key)}}</span>
             </slot>
@@ -83,6 +83,10 @@
           return []
         }
       },
+      foldWith: {
+        type: Number,
+        default: 30
+      },
       page: {
         type: Number,
         default: 1
@@ -146,8 +150,11 @@
         }
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
-      colWidth (key) {
-        return key.width ? key.width : null
+      colWidth (header) {
+        if (header.fold) {
+          return this.foldWith
+        }
+        return header.width ? header.width : null
       },
       columnData (data, column) {
         const keyName = this.keyName(column)
@@ -203,9 +210,8 @@
         }
         return dot.pick(keyName, data)
       },
-      sortBy: function (key) {
-        this.sortKey = key
-        this.sortOrders[key] = this.sortOrders[key] * -1
+      _handleClickHeader: function (header) {
+        this.$emit('click-header', header)
       },
       _handleClickPrev (event) {
         this.transition = 'table-slide-x-reverse-transition'
@@ -301,6 +307,7 @@
     background-color: #176BCC;
     color: rgba(255,255,255,0.66);
     cursor: pointer;
+    transition: width 0.1s ease-in-out;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
