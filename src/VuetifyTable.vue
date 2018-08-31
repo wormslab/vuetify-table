@@ -1,8 +1,10 @@
 <template>
   <section class="vuetify-table-container">
-    <section class="table-custom-header">
-      <slot class="table-custom-caption" name="custom-caption" />
-      <section class="custom-table-pagination" >
+    <section class="table-header">
+      <slot class="table-title" />
+    </section>
+    <section class="table-action">
+      <section class="table-pagination" >
         <vuetify-table-column-menu class="mr-2" :name="name" :columns="columns" />
         <v-pagination :value="page"
                       :length="pages"
@@ -11,7 +13,7 @@
         />
       </section>
     </section>
-    <section>
+    <section class="table-container" >
       <table>
         <caption>{{caption}}</caption>
         <thead>
@@ -231,36 +233,28 @@
 
 <style scoped>
   .vuetify-table-container {
-    width: 100%;
-    height: 100%;
     position: relative;
-    overflow-x: scroll;
   }
-  .table-custom-header {
+  .table-action {
     display: flex;
     align-items: center;
   }
-  .table-custom-header > .table-custom-caption {
-    flex: 0 0 500px;
-  }
-  .table-custom-header > .custom-table-pagination {
+  .table-action > .table-pagination {
     flex: 1 1 300px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
   }
+
+  .table-container {
+    width: 100%;
+    overflow-x: scroll;
+    position: relative;
+  }
+  
   table {
     width: 100%;
-  }
-  body {
-    font-family: Helvetica Neue, Arial, sans-serif;
-    font-size: 14px;
-    color: #444;
-  }
-
-  table {
     table-layout: fixed;
-    /*border: 2px solid #176BCC;*/
     border-radius: 3px;
     background-color: #fff;
   }

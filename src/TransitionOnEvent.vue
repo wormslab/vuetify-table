@@ -10,7 +10,9 @@
                    @prev="_handleClickPrev"
                    @click-header="_handleClickHeader"
                    @page="_handleChangePage"
-    />
+    > 
+      <div class="table-caption pa-2 primary white--text" slot="table-caption">caption</div>
+    </vuetify-table>
   </section>
 </template>
 
@@ -93,5 +95,10 @@
   .transition-on-event-container {
     position: relative;
     width: 100%;
+  }
+  .table-caption {
+    display: flex;
+    align-items: center;
+    padding: 11px;
   }
 </style>
