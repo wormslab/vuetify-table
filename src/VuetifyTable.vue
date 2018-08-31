@@ -1,7 +1,7 @@
 <template>
   <section class="vuetify-table-container">
     <section class="table-header">
-      <slot class="table-title" />
+      <slot class="table-title" name="table-title" />
     </section>
     <section class="table-action">
       <section class="table-pagination" >
