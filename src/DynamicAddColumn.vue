@@ -17,7 +17,7 @@
   export default {
     data () {
       const columns = [
-        {key: 'id', text: '아이디', width: 200, align: 'center'},
+        {key: 'id', text: '아이디', width: 200, align: 'center', type: 'currency' },
         {key: 'name', text: '이름', width: 100},
         {key: 'servicePeriod.startAt', text: '시작일', width: 250},
         {key: 'servicePeriod.endAt', text: '종료일', width: 250},

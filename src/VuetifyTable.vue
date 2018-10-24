@@ -58,7 +58,6 @@
 <script>
   import _ from 'underscore'
   import dot from 'dot-object'
-  import moment from 'moment'
   import VuetifyTableColumnMenu from './VuetifyTableColumnMenu'
   import transformByType from './transform-by-type'
   export default {
@@ -156,12 +155,6 @@
       },
       textName (column) {
         return column.key && column.text ? column.text : column
-      },
-      numberWithCommas (x) {
-        if (!x) {
-          return x
-        }
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       colWidth (header) {
         if (header.fold) {
