@@ -1,6 +1,13 @@
 import moment from 'moment'
 import dot from 'dot-object'
 
+function numberWithCommas (x) {
+  if (!x) {
+    return x
+  }
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
 export default function (column, keyName, data) {
   if (column['type'] && column['type'] === 'date') {
     const format = 'YYYY-MM-DD'
@@ -25,7 +32,7 @@ export default function (column, keyName, data) {
     return moment(new Date(v)).format(format)
   } else if (column['type'] && column['type'] === 'currency') {
     const v = dot.pick(keyName, data)
-    return `${this.numberWithCommas(Math.floor(v))} 원`
+    return `${numberWithCommas(Math.floor(v))} 원`
   } else if (column['type'] && column['type'] === 'phone') {
     const v = dot.pick(keyName, data)
     if (!v) {
