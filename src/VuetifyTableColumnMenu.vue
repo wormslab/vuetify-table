@@ -1,5 +1,5 @@
 <template>
-  <v-menu transition="slide-y-transition" bottom :close-on-content-click="false">
+  <v-menu transition="slide-y-transition" bottom :close-on-content-click="false" :max-height="500">
       <v-btn slot="activator" class="ma-0" flat>
         컬럼 표시 설정 {{activeColumns.length}}/{{columns.length}}
         <v-icon small right>settings</v-icon>
