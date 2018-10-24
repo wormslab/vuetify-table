@@ -54,6 +54,17 @@
       activeColumns () {
         return this.columns.filter(v => v.display)
       }
+    },
+    watch: {
+      columns: {
+        handler () {
+          this.columns.forEach(v => {
+            if (v.display === null || v.display === undefined) {
+              Vue.set(v, 'display', true)
+            }
+          })
+        }
+      }
     }
   }
 </script>
